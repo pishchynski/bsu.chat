@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Built-By: Pavel Pishchynski
+Created-By: IntelliJ IDEA
+

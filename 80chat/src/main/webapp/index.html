@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>80chat</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="resources/css/styles.css">
+        <script src="resources/js/controlTextFieldSize.js"></script>
+        <script src="resources/js/scripts.js"></script>
+    </head>
+    <body onload="run(); resizeTextArea();">
+        <div id="wrapper">
+            <div id="right-area">
+                <div id="users">
+
+                </div>
+            </div>
+            <div id="header">
+                <div id="login-form">
+                   <input type="text" id="login-input" placeholder="Your nickname..">
+                    <button type="submit" id="login-btn" onclick="onSignInButtonClick()">Come in</button>
+                </div>
+                <div id="logo">
+                   <h1>Welcome to 80chat</h1>
+                </div>
+            </div>
+            <div id="main-area">
+                <div id="messages">
+
+                </div>
+            </div>
+            <div id="send-area">
+                <input  type="text" id="message-write-input" placeholder="Набiрайце тут...">
+                <button id="send-button" class="btn-send" onclick="onSendButtonClick()">Даслаць!</button>
+            </div>
+        </div>
+    </body>
+</html>
