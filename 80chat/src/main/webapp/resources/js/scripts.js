@@ -5,22 +5,28 @@ var msgToEdit = null;
 
 function run(){
 
-    var allMessages = restore();
-    createAllMessages(allMessages);
+    restore();
+    //createAllMessages(allMessages);
 }
 
 function createAllMessages(allMessages){
     for(var i = 0; i < allMessages.length; i++)
-        addMsg(allMessages[i]);
+        addMsgInternal(allMessages[i]);
 }
 
 function messageCreature(user, text){
     return{
         user: user,
-        text: text,
-        id: createId()
+        text: text
+       // id: createId()
     };
 }
+
+var appState = {
+    mainUrl : '80chat',
+    msgList:[],
+    token : 'TE11EN'
+};
 
 function onSendButtonClick() {
     var msgField = document.getElementById('message-write-input');
@@ -86,29 +92,35 @@ function createNewUser(value){
     return divItem;
 }
 
-function addMsg(message){
+function addMsg(message, continueWith){
+    post(appState.mainUrl, JSON.stringify(message), function(){
+        restore();
+    });
+}
 
-    messagesList.push(message);
+function addMsgInternal(message){
+
+    //messagesList.push(message);
     var item = createItem(message);
     var messages = document.getElementById('messages');
     messages.appendChild(item);
 
-    store(messagesList);
+    //store(messagesList);
 }
 
 
 
-function createId(){
+/*function createId(){
     var id = Math.random();
     id *= Date.now();
     id = Math.floor(id);
     return id;
-}
+}*/
 
 function createItem(msgStruct){
     var divItem = document.createElement('div');
     divItem.classList.add('msg');
-    divItem.setAttribute('id', msgStruct.id.toString());
+    //divItem.setAttribute('id', msgStruct.id.toString());
     var userNameSpan = divItem.appendChild(document.createElement('span'));
     userNameSpan.setAttribute('class', 'username');
     userNameSpan.appendChild(document.createTextNode(msgStruct.user.toString() + ': '));
@@ -119,11 +131,11 @@ function createItem(msgStruct){
     divItem.appendChild(paragraph);
     var edit = document.createElement('img');
     var close = document.createElement('img');
-    edit.src = "images/edit.png";
-    close.src = "images/close.png";
+    edit.src = "../resources/images/edit.png";
+    close.src = "../resources/images/close.png";
     edit.setAttribute("id", "edit-button");
     close.setAttribute("id", "remove-button");
-    edit.setAttribute("onclick", "setMsgToEdit(this)");
+    edit.setAttribute("onclick", "setMsgToEdit(this.parentNode)");
     close.setAttribute("onclick", "removeMsg(this)");
     divItem.appendChild(close);
     divItem.appendChild(edit);
@@ -132,12 +144,17 @@ function createItem(msgStruct){
 }
 
 function setMsgToEdit(item){
-    window.msgToEdit = item.attributes['id'].value;
+    window.msgToEdit = item;
 }
 
 function editMsg(msgText){
-    var message = document.getElementById(msgToEdit);
-    message.getElementsByClassName("msg-text")[0].nodeValue = msgText;
+    var message = window.msgToEdit;
+    var spanToDel = (message.getElementsByClassName("msg-text")).item(0);
+    message.removeChild(spanToDel);
+    var paragraph = document.createElement('span');
+    paragraph.setAttribute('class', 'msg-text');
+    paragraph.appendChild(document.createTextNode(msgText));
+    message.appendChild(paragraph);
 }
 
 function removeMsg(item){
@@ -147,7 +164,95 @@ function removeMsg(item){
     return;
 }
 
-function removeMsgFromLocal(item){
+function restore(continueWith){
+    var url = appState.mainUrl + '?token=' + appState.token;
+
+    get(url, function(responseText) {
+        console.assert(responseText != null);
+
+        var response = JSON.parse(responseText);
+
+        appState.token = response.token;
+        createAllMessages(response.messages);
+
+        continueWith && continueWith();
+    });
+}
+
+function defaultErrorHandler(message) {
+    console.error(message);
+}
+
+function get(url, continueWith, continueWithError) {
+    ajax('GET', url, null, continueWith, continueWithError);
+}
+
+function post(url, data, continueWith, continueWithError) {
+    ajax('POST', url, data, continueWith, continueWithError);
+}
+
+function put(url, data, continueWith, continueWithError) {
+    ajax('PUT', url, data, continueWith, continueWithError);
+}
+
+function isError(text) {
+    if(text == "")
+        return false;
+
+    try {
+        var obj = JSON.parse(text);
+    } catch(ex) {
+        return true;
+    }
+
+    return !!obj.error;
+}
+
+function ajax(method, url, data, continueWith, continueWithError) {
+    var xhr = new XMLHttpRequest();
+
+    continueWithError = continueWithError || defaultErrorHandler;
+    xhr.open(method || 'GET', url, true);
+
+    xhr.onload = function () {
+        if (xhr.readyState !== 4)
+            return;
+
+        if(xhr.status != 200) {
+            continueWithError('Error on the server side, response ' + xhr.status);
+            return;
+        }
+
+        if(isError(xhr.responseText)) {
+            continueWithError('Error on the server side, response ' + xhr.responseText);
+            return;
+        }
+
+        continueWith(xhr.responseText);
+    };
+
+    xhr.ontimeout = function () {
+        ontinueWithError('Server timed out !');
+    }
+
+    xhr.onerror = function (e) {
+        var errMsg = 'Server connection error !\n'+
+            '\n' +
+            'Check if \n'+
+            '- server is active\n'+
+            '- server sends header "Access-Control-Allow-Origin:*"';
+
+        continueWithError(errMsg);
+    };
+
+    xhr.send(data);
+}
+
+window.onerror = function(err) {
+}
+
+
+/*function removeMsgFromLocal(item){
     var msgNum = item.attributes['id'].value;
     for(var i = 0; i < messagesList.length; ++i){
         if(msgNum == messagesList[i].id){
@@ -156,9 +261,9 @@ function removeMsgFromLocal(item){
             break;
         }
     }
-}
+}*/
 
-function store(listToSave) {
+/*function store(listToSave) {
 
     if(typeof(Storage) == "undefined") {
         alert('localStorage is not accessible');
@@ -177,4 +282,4 @@ function restore() {
     var item = localStorage.getItem("80Chat messages");
 
     return item && JSON.parse(item);
-}
+}*/

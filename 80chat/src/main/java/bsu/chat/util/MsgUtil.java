@@ -35,7 +35,7 @@ public class MsgUtil {
         return (JSONObject) parser.parse(data.trim());
     }
 
-    public static Msg jsonToTask(JSONObject json) {
+    public static Msg jsonToMsg(JSONObject json) {
         Object id = json.get(ID);
         Object user = json.get(USERNAME);
         Object text = json.get(TEXT);

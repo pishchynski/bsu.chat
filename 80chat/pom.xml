@@ -19,6 +19,26 @@
           <artifactId>javax.servlet-api</artifactId>
           <version>3.1.0</version>
       </dependency>
+      <!-- JSON simple -->
+      <dependency>
+          <groupId>com.googlecode.json-simple</groupId>
+          <artifactId>json-simple</artifactId>
+          <version>1.1.1</version>
+      </dependency>
+
+      <!-- Log4J -->
+      <dependency>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.17</version>
+      </dependency>
+
+      <!-- JSON in Java -->
+      <dependency>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+          <version>20141113</version>
+      </dependency>
   </dependencies>
   <build>
     <finalName>80chat</finalName>
