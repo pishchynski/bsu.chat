@@ -173,9 +173,10 @@ function restore(continueWith){
         var response = JSON.parse(responseText);
 
         appState.token = response.token;
-        createAllMessages(response.messages);
 
-        continueWith && continueWith();
+        createAllMessages(response.messages);
+    }, function(message){
+        defaultErrorHandler(message)
     });
 }
 
@@ -232,7 +233,7 @@ function ajax(method, url, data, continueWith, continueWithError) {
     };
 
     xhr.ontimeout = function () {
-        ontinueWithError('Server timed out !');
+        continueWithError('Server timed out !');
     }
 
     xhr.onerror = function (e) {

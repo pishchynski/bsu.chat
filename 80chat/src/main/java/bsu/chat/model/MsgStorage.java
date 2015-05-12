@@ -9,7 +9,7 @@ import java.util.List;
  * Created by Pavel Pishchynski on 26.04.2015.
  */
 public class MsgStorage {
-    private static List<Msg> storage = Collections.synchronizedList(new ArrayList<Msg>());
+    private static List<Msg> storage = new ArrayList<Msg>();
 
     private MsgStorage(){
     }

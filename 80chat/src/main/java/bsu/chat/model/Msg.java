@@ -55,6 +55,10 @@ public class Msg {
         return this.text;
     }
 
+    public String toString() {
+        return "{\"id\":\"" + this.id + "\",\"user\":\"" + this.user + "\",\"text\":\"" + this.text + "\" }";
+    }
+
     public boolean setText(String text){
         this.text = text;
         return true;

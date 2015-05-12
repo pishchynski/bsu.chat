@@ -15,7 +15,7 @@ public class MsgUtil {
     private static final String TN = "TN";
     private static final String EN = "EN";
     private static final String ID = "id";
-    private static final String USERNAME = "username";
+    private static final String USER = "user";
     private static final String TEXT = "text";
 
     private MsgUtil(){
@@ -36,12 +36,12 @@ public class MsgUtil {
     }
 
     public static Msg jsonToMsg(JSONObject json) {
-        Object id = json.get(ID);
-        Object user = json.get(USERNAME);
+        //Object id = json.get(ID);
+        Object user = json.get(USER);
         Object text = json.get(TEXT);
 
-        if (id != null && user != null && text != null) {
-            return new Msg((String) id, (String) user, (String) text);
+        if (/*id != null && */user != null && text != null) {
+            return new Msg(/*(String) id,*/ (String) user, (String) text);
         }
         return null;
     }

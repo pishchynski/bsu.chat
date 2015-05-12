@@ -2,6 +2,7 @@ package bsu.chat.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,14 +32,21 @@ public class ChatServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(ChatServlet.class.getName());
 
-//    @Override
-//    public void init() throws ServletException {
+    @Override
+    public void init() throws ServletException {
+        try {
+            addStubData();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }
 //        try {
 //            loadHistory();
 //        } catch (SAXException | IOException | ParserConfigurationException | TransformerException e) {
 //            logger.error(e);
 //        }
-//    }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -92,7 +100,7 @@ public class ChatServlet extends HttpServlet {
                 //XMLHistoryUtil.updateData(taskToUpdate);
                 response.setStatus(HttpServletResponse.SC_OK);
             } else {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Task does not exist");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Message does not exist");
             }
         } catch (ParseException/* | ParserConfigurationException | SAXException | TransformerException | XPathExpressionException*/ e) {
             logger.error(e);
@@ -103,8 +111,10 @@ public class ChatServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     private String formResponse(int index) {
         JSONObject jsonObject = new JSONObject();
+        List<Msg> msgList = MsgStorage.getSubMsgListByIndex(index);
         jsonObject.put(MESSAGES, MsgStorage.getSubMsgListByIndex(index));
         jsonObject.put(TOKEN, getToken(MsgStorage.getSize()));
+        String hujnia = jsonObject.toJSONString();
         return jsonObject.toJSONString();
     }
 
@@ -117,20 +127,19 @@ public class ChatServlet extends HttpServlet {
 //        }
 //    }
 
-//    private void addStubData() throws ParserConfigurationException, TransformerException {
-//        Msg[] stubTasks = {
-//                new Msg("1", "Create markup", true),
-//                new Msg("2", "Learn JavaScript", true),
-//                new Msg("3", "Learn Java Servlet Technology", false),
-//                new Msg("4", "Write The Chat !", false), };
-//        TaskStorage.addAll(stubTasks);
-//        for (Task task : stubTasks) {
+    private void addStubData() throws ParserConfigurationException, TransformerException {
+        Msg[] stubTasks = {
+                new Msg("No-nothing", "Hello "),
+                new Msg("No-nothing", "Please log in"),
+                new Msg("No-nothing", "To be with us")};
+        MsgStorage.addAll(stubTasks);
+//        for (Msg task : stubTasks) {
 //            try {
 //                XMLHistoryUtil.addData(task);
 //            } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
 //                logger.error(e);
 //            }
 //        }
-//    }
+    }
 
 }
