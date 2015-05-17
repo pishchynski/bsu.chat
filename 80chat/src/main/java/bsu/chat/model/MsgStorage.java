@@ -22,8 +22,8 @@ public class MsgStorage {
         storage.add(msg);
     }
 
-    public static void addAll(Msg[] messages){
-        storage.addAll(Arrays.asList(messages));
+    public static void addAll(List<Msg> messages){
+        storage.addAll(messages);
     }
 
     public static int getSize(){
@@ -36,6 +36,14 @@ public class MsgStorage {
 
     public static List<Msg> getSubMsgListByIndex(int index){
         return storage.subList(index, storage.size());
+    }
+
+    public static void setMsgById(Msg msg) {
+        for (int i = 0; i < storage.size(); i++) {
+            if (storage.get(i).getID().equals(msg.getID())) {
+                storage.set(i, msg);
+            }
+        }
     }
 
     public static Msg getMsgById(String id){

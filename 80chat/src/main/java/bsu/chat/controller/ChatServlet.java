@@ -2,6 +2,7 @@ package bsu.chat.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -22,6 +23,9 @@ import org.json.simple.parser.ParseException;
 import org.xml.sax.SAXException;
 
 import static bsu.chat.util.MsgUtil.*;
+import static bsu.chat.util.ServletUtil.TOKEN;
+import static bsu.chat.util.ServletUtil.DELETED;
+import bsu.chat.storage.xml.XMLHistoryUtil;
 
 /**
  * Created by Pavel Pishchynski on 26.04.2015.
@@ -35,17 +39,11 @@ public class ChatServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         try {
-            addStubData();
-        } catch (ParserConfigurationException e) {
+            loadHistory();
+        } catch (SAXException | IOException | ParserConfigurationException | TransformerException e)  {
             e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
-//        try {
-//            loadHistory();
-//        } catch (SAXException | IOException | ParserConfigurationException | TransformerException e) {
-//            logger.error(e);
-//        }
     }
 
     @Override
@@ -76,9 +74,9 @@ public class ChatServlet extends HttpServlet {
             JSONObject json = stringToJson(data);
             Msg msg = jsonToMsg(json);
             MsgStorage.addMsg(msg);
-            //XMLHistoryUtil.addData(task);
+            XMLHistoryUtil.addData(msg);
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (ParseException /*| ParserConfigurationException | SAXException | TransformerException*/ e) {
+        } catch (ParseException | ParserConfigurationException | SAXException | TransformerException e) {
             logger.error(e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
@@ -97,13 +95,27 @@ public class ChatServlet extends HttpServlet {
             if (msgToUpdate != null) {
                 msgToUpdate.setUsername(msg.getUsername());
                 msgToUpdate.setText(msg.getText());
-                //XMLHistoryUtil.updateData(taskToUpdate);
+                XMLHistoryUtil.updateData(msgToUpdate);
                 response.setStatus(HttpServletResponse.SC_OK);
             } else {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Message does not exist");
             }
-        } catch (ParseException/* | ParserConfigurationException | SAXException | TransformerException | XPathExpressionException*/ e) {
+        } catch (ParseException | ParserConfigurationException | SAXException | TransformerException | XPathExpressionException e) {
             logger.error(e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String data = ServletUtil.getMessageBody(request);
+        try {
+            JSONObject json = stringToJson(data);
+            Msg msg = jsonToMsg(json);
+            msg.setUsername(DELETED);
+            msg.setText(DELETED);
+            MsgStorage.setMsgById(msg);
+        } catch (ParseException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
@@ -114,32 +126,32 @@ public class ChatServlet extends HttpServlet {
         List<Msg> msgList = MsgStorage.getSubMsgListByIndex(index);
         jsonObject.put(MESSAGES, MsgStorage.getSubMsgListByIndex(index));
         jsonObject.put(TOKEN, getToken(MsgStorage.getSize()));
-        String hujnia = jsonObject.toJSONString();
         return jsonObject.toJSONString();
     }
 
-//    private void loadHistory() throws SAXException, IOException, ParserConfigurationException, TransformerException  {
-//        if (XMLHistoryUtil.doesStorageExist()) {
-//            TaskStorage.addAll(XMLHistoryUtil.getTasks());
-//        } else {
-//            XMLHistoryUtil.createStorage();
-//            addStubData();
-//        }
-//    }
+    private void loadHistory() throws SAXException, IOException, ParserConfigurationException, TransformerException  {
+        if (XMLHistoryUtil.doesStorageExist()) {
+            MsgStorage.addAll(XMLHistoryUtil.getMessages());
+        } else {
+            XMLHistoryUtil.createStorage();
+            addStubData();
+        }
+    }
 
     private void addStubData() throws ParserConfigurationException, TransformerException {
-        Msg[] stubTasks = {
+        Msg[] stubMessages = {
                 new Msg("No-nothing", "Hello "),
                 new Msg("No-nothing", "Please log in"),
                 new Msg("No-nothing", "To be with us")};
-        MsgStorage.addAll(stubTasks);
-//        for (Msg task : stubTasks) {
-//            try {
-//                XMLHistoryUtil.addData(task);
-//            } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
-//                logger.error(e);
-//            }
-//        }
+       // MsgStorage.addAll(Arrays.asList(stubTasks));
+
+        for (Msg msg : stubMessages) {
+            try {
+                XMLHistoryUtil.addData(msg);
+            } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
+                logger.error(e);
+            }
+        }
     }
 
 }

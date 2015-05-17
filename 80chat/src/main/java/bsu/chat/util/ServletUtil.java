@@ -16,6 +16,7 @@ public class ServletUtil {
     public static final String APPLICATION_JSON = "application/json";
     private static final String MESSAGES = "messages";
     public static final String TOKEN = "token";
+    public  static final String DELETED = "DELETED";
 
     public static String getMessageBody(HttpServletRequest request) throws IOException {
         StringBuilder sb = new StringBuilder();

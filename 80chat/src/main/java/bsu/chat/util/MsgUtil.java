@@ -14,9 +14,11 @@ public class MsgUtil {
     public static final String MESSAGES = "messages";
     private static final String TN = "TN";
     private static final String EN = "EN";
-    private static final String ID = "id";
-    private static final String USER = "user";
-    private static final String TEXT = "text";
+    public static final String ID = "id";
+    public static final String USER = "user";
+    public static final String TEXT = "text";
+    public static final String DATE = "date";
+    public static final String DATE_FORMAT = "dd-MM-yyyy HH:mm";
 
     private MsgUtil(){
     }
