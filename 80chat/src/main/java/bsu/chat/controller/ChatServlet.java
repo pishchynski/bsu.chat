@@ -35,7 +35,7 @@ import bsu.chat.storage.xml.XMLHistoryUtil;
 public class ChatServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static Logger logger = Logger.getLogger(ChatServlet.class.getName());
-    private StringBuffer prevToken = new StringBuffer("");
+    private int prevSize;
 
     @Override
     public void init() throws ServletException {
@@ -54,10 +54,10 @@ public class ChatServlet extends HttpServlet {
         logger.info("Token " + token);
 
         if (token != null && !"".equals(token)) {
-            if(!token.equals(prevToken.toString())) {
+           if(!(MsgStorage.getSize() == prevSize)) {
                 int index = getIndex(token);
-                prevToken.replace(0, prevToken.length(), token);
                 logger.info("Index " + index);
+                prevSize = MsgStorage.getSize();
                 String messages = formResponse(index);
                 response.setContentType(ServletUtil.APPLICATION_JSON);
                 PrintWriter out = response.getWriter();
